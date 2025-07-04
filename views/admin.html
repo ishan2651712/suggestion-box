@@ -41,13 +41,47 @@
         background-color: #d93636;
       }
       .container {
-        max-width: 1000px;
         margin: 30px auto;
         padding: 20px;
         background: #fff;
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
       }
+      .dashboard-layout {
+        display: flex;
+        column-gap: 80px;
+        margin: 30px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      }
+
+      .left-charts {
+        flex: 1 1 35%;
+        min-width: 300px;
+      }
+
+      .right-content {
+        flex: 1 1 60%;
+        min-width: 350px;
+      }
+      .action-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .csv-export-button {
+        margin-bottom: 20px;
+        padding: 10px 16px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
       label {
         font-weight: bold;
         display: block;
@@ -151,60 +185,57 @@
     </header>
 
     <div class="container">
-      <label for="filter">Filter by Category:</label>
-      <select id="filter">
-        <option value="All">All</option>
-        <option value="Academics">Academics</option>
-        <option value="Faculty">Faculty</option>
-        <option value="Transport">Transport</option>
-        <option value="Canteen">Canteen</option>
-        <option value="Other">Other</option>
-      </select>
+      <div class="dashboard-layout">
+        <div class="left-charts">
+          <canvas id="categoryChart" height="200"></canvas>
+          <canvas
+            id="dailyChart"
+            height="200"
+            style="margin-top: 40px"
+          ></canvas>
+        </div>
 
-      <button
-        onclick="exportCSV()"
-        style="
-          margin-bottom: 20px;
-          padding: 10px 16px;
-          background-color: #28a745;
-          color: white;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-          font-weight: bold;
-        "
-      >
-        ⬇ Export CSV
-      </button>
+        <div class="right-content">
+          <div class="action-bar">
+            <label for="filter">Filter by Category:</label>
+            <button onclick="exportCSV()" class="csv-export-button">
+              ⬇ Export CSV
+            </button>
+          </div>
+          <select id="filter">
+            <option value="All">All</option>
+            <option value="Academics">Academics</option>
+            <option value="Faculty">Faculty</option>
+            <option value="Transport">Transport</option>
+            <option value="Canteen">Canteen</option>
+            <option value="Other">Other</option>
+          </select>
 
-      <input
-        type="text"
-        id="searchInput"
-        placeholder="🔍 Search suggestions..."
-      />
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="🔍 Search suggestions..."
+          />
 
-      <div class="charts-container">
-        <canvas id="categoryChart" height="200"></canvas>
-        <canvas id="dailyChart" height="200" style="margin-top: 40px"></canvas>
-      </div>
+          <table id="suggestionTable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Category</th>
+                <th>Message</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
 
-      <table id="suggestionTable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Category</th>
-            <th>Message</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-
-      <div class="pagination" style="text-align: center; margin-top: 20px">
-        <button onclick="prevPage()">⬅ Prev</button>
-        <span id="pageNumber">Page 1</span>
-        <button onclick="nextPage()">Next ➡</button>
+          <div class="pagination" style="text-align: center; margin-top: 20px">
+            <button onclick="prevPage()">⬅ Prev</button>
+            <span id="pageNumber">Page 1</span>
+            <button onclick="nextPage()">Next ➡</button>
+          </div>
+        </div>
       </div>
     </div>
 
