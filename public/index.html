@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Suggestly – Suggestion Box</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <button
+      class="admin-login-btn"
+      onclick="window.location.href='/admin/login'"
+    >
+      🔐 Admin Login
+    </button>
+    <div class="container">
+      <h1>📬 Suggestly</h1>
+      <div class="subtitle">
+        We value your suggestions to improve our institution.
+      </div>
+
+      <form id="suggestionForm">
+        <input type="text" id="name" placeholder="Your Name" required />
+        <input type="email" id="email" placeholder="Your Email" required />
+
+        <select id="category" required>
+          <option value="">Select Category</option>
+          <option value="Academics">Academics</option>
+          <option value="Faculty">Faculty</option>
+          <option value="Transport">Transport</option>
+          <option value="Canteen">Canteen</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <textarea
+          id="message"
+          placeholder="Write your suggestion here..."
+          required
+        ></textarea>
+
+        <button type="submit">Submit Suggestion</button>
+      </form>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>

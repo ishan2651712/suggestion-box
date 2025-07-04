@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Suggestly – Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f4f6f8;
+        margin: 0;
+        padding: 0;
+      }
+      header {
+        background-color: #003366;
+        color: #fff;
+        padding: 20px;
+        text-align: center;
+        position: relative;
+      }
+      h1 {
+        margin: 0;
+        font-size: 28px;
+      }
+      .logout-button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .logout-button:hover {
+        background-color: #d93636;
+      }
+      .container {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      }
+      label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 10px;
+      }
+      select,
+      input[type="text"] {
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        width: 100%;
+      }
+      .charts-container {
+        padding: 30px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        margin-bottom: 40px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 15px;
+      }
+      th,
+      td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      th {
+        background-color: #007bff;
+        color: white;
+      }
+      tr:hover {
+        background-color: #f1f1f1;
+      }
+      .footer {
+        text-align: center;
+        color: #888;
+        margin-top: 40px;
+        font-size: 14px;
+      }
+      @media (max-width: 768px) {
+        table,
+        thead,
+        tbody,
+        th,
+        td,
+        tr {
+          display: block;
+        }
+        th {
+          display: none;
+        }
+        td {
+          position: relative;
+          padding-left: 50%;
+          border: none;
+          border-bottom: 1px solid #eee;
+        }
+        td:before {
+          position: absolute;
+          left: 10px;
+          top: 12px;
+          white-space: nowrap;
+          font-weight: bold;
+        }
+        td:nth-of-type(1):before {
+          content: "Name";
+        }
+        td:nth-of-type(2):before {
+          content: "Email";
+        }
+        td:nth-of-type(3):before {
+          content: "Category";
+        }
+        td:nth-of-type(4):before {
+          content: "Message";
+        }
+        td:nth-of-type(5):before {
+          content: "Date";
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 🔐 Token check -->
+    <script>
+      if (!sessionStorage.getItem("token")) {
+        alert("⛔ Access denied. Please log in.");
+        window.location.href = "/admin/login";
+      }
+    </script>
+
+    <header>
+      <h1>📊 Suggestly – Admin Dashboard</h1>
+      <button onclick="logout()" class="logout-button">Logout</button>
+    </header>
+
+    <div class="container">
+      <label for="filter">Filter by Category:</label>
+      <select id="filter">
+        <option value="All">All</option>
+        <option value="Academics">Academics</option>
+        <option value="Faculty">Faculty</option>
+        <option value="Transport">Transport</option>
+        <option value="Canteen">Canteen</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <button
+        onclick="exportCSV()"
+        style="
+          margin-bottom: 20px;
+          padding: 10px 16px;
+          background-color: #28a745;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: bold;
+        "
+      >
+        ⬇ Export CSV
+      </button>
+
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="🔍 Search suggestions..."
+      />
+
+      <div class="charts-container">
+        <canvas id="categoryChart" height="200"></canvas>
+        <canvas id="dailyChart" height="200" style="margin-top: 40px"></canvas>
+      </div>
+
+      <table id="suggestionTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Category</th>
+            <th>Message</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div class="pagination" style="text-align: center; margin-top: 20px">
+        <button onclick="prevPage()">⬅ Prev</button>
+        <span id="pageNumber">Page 1</span>
+        <button onclick="nextPage()">Next ➡</button>
+      </div>
+    </div>
+
+    <div class="footer">&copy; 2025 Suggestly · All rights reserved.</div>
+
+    <script>
+      function logout() {
+        sessionStorage.removeItem("token");
+        alert("👋 Logged out successfully.");
+        window.location.href = "/admin/login";
+      }
+
+      async function exportCSV() {
+        const token = sessionStorage.getItem("token");
+        try {
+          const response = await fetch("/admin/export", {
+            headers: { Authorization: "Bearer " + token },
+          });
+          if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error || "Export failed");
+          }
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "suggestions.csv";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        } catch (err) {
+          alert("❌ Export failed: " + err.message);
+        }
+      }
+
+      async function renderCharts() {
+        const res = await fetch("/admin/data", {
+          headers: {
+            Authorization: "Bearer " + sessionStorage.getItem("token"),
+          },
+        });
+        const data = await res.json();
+
+        const categoryCounts = {};
+        data.forEach((s) => {
+          categoryCounts[s.category] = (categoryCounts[s.category] || 0) + 1;
+        });
+
+        const ctx1 = document.getElementById("categoryChart").getContext("2d");
+        new Chart(ctx1, {
+          type: "pie",
+          data: {
+            labels: Object.keys(categoryCounts),
+            datasets: [
+              {
+                data: Object.values(categoryCounts),
+                backgroundColor: [
+                  "#007bff",
+                  "#28a745",
+                  "#ffc107",
+                  "#dc3545",
+                  "#6c757d",
+                ],
+              },
+            ],
+          },
+          options: {
+            plugins: {
+              title: {
+                display: true,
+                text: "Suggestion Distribution by Category",
+              },
+            },
+          },
+        });
+
+        const last7 = Array.from({ length: 7 }, (_, i) => {
+          const d = new Date();
+          d.setDate(d.getDate() - (6 - i));
+          return d.toISOString().slice(0, 10);
+        });
+
+        const dailyCounts = last7.map(
+          (date) =>
+            data.filter((s) => s.created_at.slice(0, 10) === date).length
+        );
+
+        const ctx2 = document.getElementById("dailyChart").getContext("2d");
+        new Chart(ctx2, {
+          type: "bar",
+          data: {
+            labels: last7,
+            datasets: [
+              {
+                label: "Suggestions per Day",
+                data: dailyCounts,
+                backgroundColor: "#003366",
+              },
+            ],
+          },
+          options: {
+            plugins: {
+              title: {
+                display: true,
+                text: "Suggestions Received (Last 7 Days)",
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+      }
+
+      let currentPage = 1;
+
+      async function fetchSuggestions(category = "All", page = 1) {
+        const token = sessionStorage.getItem("token");
+        const searchTerm = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+
+        const response = await fetch(`/admin/data?page=${page}`, {
+          headers: { Authorization: "Bearer " + token },
+        });
+
+        const suggestions = await response.json();
+        const tbody = document.querySelector("#suggestionTable tbody");
+        tbody.innerHTML = "";
+
+        const filtered = suggestions.filter(
+          (s) =>
+            (category === "All" || s.category === category) &&
+            (s.name.toLowerCase().includes(searchTerm) ||
+              s.email.toLowerCase().includes(searchTerm) ||
+              s.message.toLowerCase().includes(searchTerm))
+        );
+
+        filtered.forEach((s) => {
+          const row = `
+            <tr>
+              <td>${s.name}</td>
+              <td>${s.email}</td>
+              <td>${s.category}</td>
+              <td>${s.message}</td>
+              <td>${new Date(s.created_at).toLocaleString()}</td>
+            </tr>`;
+          tbody.innerHTML += row;
+        });
+
+        document.getElementById("pageNumber").innerText = `Page ${currentPage}`;
+      }
+
+      function nextPage() {
+        currentPage++;
+        fetchSuggestions(document.getElementById("filter").value, currentPage);
+      }
+
+      function prevPage() {
+        if (currentPage > 1) {
+          currentPage--;
+          fetchSuggestions(
+            document.getElementById("filter").value,
+            currentPage
+          );
+        }
+      }
+
+      document.getElementById("filter").addEventListener("change", (e) => {
+        currentPage = 1;
+        fetchSuggestions(e.target.value, currentPage);
+      });
+
+      document.getElementById("searchInput").addEventListener("input", () => {
+        fetchSuggestions(document.getElementById("filter").value, currentPage);
+      });
+
+      fetchSuggestions("All", currentPage);
+      renderCharts();
+    </script>
+  </body>
+</html>
