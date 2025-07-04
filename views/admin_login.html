@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Admin Login – CampusVoice</title>
+    <title>Admin Login – Suggestly</title>
     <link rel="stylesheet" href="/style.css" />
     <style>
       body {
@@ -10,15 +10,6 @@
         background: #f4f6f8;
         margin: 0;
         padding: 0;
-      }
-
-      .login-container {
-        max-width: 400px;
-        margin: 100px auto;
-        padding: 30px;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
       }
 
       h2 {
@@ -87,7 +78,7 @@
             const data = await res.json();
 
             if (res.ok && data.token) {
-              localStorage.setItem("token", data.token); // ✅ Save token
+              sessionStorage.setItem("token", data.token); // ✅ Save token
               alert("✅ Login successful!");
               window.location.href = "/admin"; // ✅ Redirect to dashboard
             } else {

@@ -157,6 +157,11 @@ app.get("/admin/search", authMiddleware, (req, res) => {
   });
 });
 
+// 404 Page Handler (should be at the end)
+app.use((req, res) => {
+  res.status(404).sendFile(__dirname + "/views/404.html");
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);

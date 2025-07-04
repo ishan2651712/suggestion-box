@@ -27,6 +27,23 @@ body {
   transition: 0.3s ease;
 }
 
+.admin-login-btn {
+  position: fixed; /* Fixed to the top-right corner of the viewport */
+  top: 20px;
+  right: 20px;
+  padding: 10px 16px;
+  background-color: #003366;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 1000;
+}
+.admin-login-btn:hover {
+  background-color: #002244;
+}
+
 /* ===== Heading & Subtitle ===== */
 h1 {
   font-size: 30px;
@@ -38,6 +55,15 @@ h1 {
   font-size: 15px;
   color: #666;
   margin-bottom: 25px;
+}
+
+.login-container {
+  width: 300px;
+  margin: 100px auto;
+  padding: 30px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
 
 /* ===== Form Elements ===== */

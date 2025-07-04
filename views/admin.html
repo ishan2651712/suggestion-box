@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>CampusVoice – Admin Dashboard</title>
+    <title>Suggestly – Admin Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       * {
@@ -139,14 +139,14 @@
   <body>
     <!-- 🔐 Token check -->
     <script>
-      if (!localStorage.getItem("token")) {
+      if (!sessionStorage.getItem("token")) {
         alert("⛔ Access denied. Please log in.");
         window.location.href = "/admin/login";
       }
     </script>
 
     <header>
-      <h1>📊 CampusVoice – Admin Dashboard</h1>
+      <h1>📊 Suggestly – Admin Dashboard</h1>
       <button onclick="logout()" class="logout-button">Logout</button>
     </header>
 
@@ -208,17 +208,17 @@
       </div>
     </div>
 
-    <div class="footer">&copy; 2025 CampusVoice · All rights reserved.</div>
+    <div class="footer">&copy; 2025 Suggestly · All rights reserved.</div>
 
     <script>
       function logout() {
-        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
         alert("👋 Logged out successfully.");
         window.location.href = "/admin/login";
       }
 
       async function exportCSV() {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         try {
           const response = await fetch("/admin/export", {
             headers: { Authorization: "Bearer " + token },
@@ -243,7 +243,9 @@
 
       async function renderCharts() {
         const res = await fetch("/admin/data", {
-          headers: { Authorization: "Bearer " + localStorage.getItem("token") },
+          headers: {
+            Authorization: "Bearer " + sessionStorage.getItem("token"),
+          },
         });
         const data = await res.json();
 
@@ -323,7 +325,7 @@
       let currentPage = 1;
 
       async function fetchSuggestions(category = "All", page = 1) {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         const searchTerm = document
           .getElementById("searchInput")
           .value.toLowerCase();
