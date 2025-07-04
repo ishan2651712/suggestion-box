@@ -5,9 +5,16 @@
     <title>Admin Login – CampusVoice</title>
     <link rel="stylesheet" href="/style.css" />
     <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f4f6f8;
+        margin: 0;
+        padding: 0;
+      }
+
       .login-container {
         max-width: 400px;
-        margin: 80px auto;
+        margin: 100px auto;
         padding: 30px;
         background: #fff;
         border-radius: 12px;
@@ -26,6 +33,7 @@
         margin-bottom: 16px;
         border: 1px solid #ccc;
         border-radius: 8px;
+        font-size: 16px;
       }
 
       button {
@@ -37,6 +45,7 @@
         border: none;
         border-radius: 8px;
         cursor: pointer;
+        font-weight: bold;
       }
 
       button:hover {
@@ -54,31 +63,41 @@
       </form>
     </div>
 
-    <!-- ✅ INSERTED TOKEN-SAVING SCRIPT BELOW -->
     <script>
       document
         .getElementById("adminLoginForm")
         .addEventListener("submit", async (e) => {
           e.preventDefault();
 
-          const username = document.getElementById("username").value;
+          const username = document.getElementById("username").value.trim();
           const password = document.getElementById("password").value;
 
-          const res = await fetch("/admin/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password }),
-          });
+          if (!username || !password) {
+            alert("⚠️ Please enter both username and password.");
+            return;
+          }
 
-          const data = await res.json();
+          try {
+            const res = await fetch("/admin/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username, password }),
+            });
 
-          if (res.status === 200) {
-            // ✅ Save token in localStorage
-            localStorage.setItem("token", data.token);
-            alert("✅ Login successful!");
-            window.location.href = "/admin"; // Redirect to dashboard
-          } else {
-            alert("❌ " + data.message);
+            const data = await res.json();
+
+            if (res.ok && data.token) {
+              localStorage.setItem("token", data.token); // ✅ Save token
+              alert("✅ Login successful!");
+              window.location.href = "/admin"; // ✅ Redirect to dashboard
+            } else {
+              alert(
+                "❌ " + (data.message || "Login failed. Please try again.")
+              );
+            }
+          } catch (error) {
+            console.error("Login error:", error);
+            alert("🚫 Network error. Please try again later.");
           }
         });
     </script>

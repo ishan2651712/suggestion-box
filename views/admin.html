@@ -219,7 +219,7 @@
 
       async function renderCharts() {
         const res = await fetch("/admin/data", {
-          headers: { Authorization: localStorage.getItem("token") },
+          headers: { Authorization: "Bearer " + localStorage.getItem("token") },
         });
         const data = await res.json();
 
@@ -305,7 +305,7 @@
           .value.toLowerCase();
 
         const response = await fetch(`/admin/data?page=${page}`, {
-          headers: { Authorization: token },
+          headers: { Authorization: "Bearer " + token },
         });
 
         const suggestions = await response.json();

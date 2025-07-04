@@ -15,8 +15,8 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static("public")); // Serves index.html
-app.use("/admin", express.static("views")); // Serves admin.html and admin_login.html
+app.use(express.static("public")); // for index.html
+app.use("/admin", express.static("views")); // to serve admin.html & admin_login.html
 
 // Home route
 app.get("/", (req, res) => {
@@ -28,12 +28,12 @@ app.get("/admin/login", (req, res) => {
   res.sendFile(__dirname + "/views/admin_login.html");
 });
 
-// 🔐 Serve Admin Dashboard (after login) — CORRECTED
-app.get(["/admin", "/admin/"], authMiddleware, (req, res) => {
+// ✅ Serve Admin Dashboard (without auth middleware)
+app.get("/admin", (req, res) => {
   res.sendFile(__dirname + "/views/admin.html");
 });
 
-// Suggestion submission
+// Submit suggestion
 app.post("/submit", (req, res) => {
   const { name, email, category, message } = req.body;
 
@@ -48,12 +48,10 @@ app.post("/submit", (req, res) => {
   db.query(sql, values, (err, result) => {
     if (err) {
       console.error("❌ Failed to insert suggestion:", err);
-      return res
-        .status(500)
-        .json({ message: "Database error. Try again later." });
+      return res.status(500).json({ message: "Database error." });
     }
 
-    // ✅ Send email for important categories
+    // ✅ Send email only for important categories
     if (["Faculty", "Transport"].includes(category)) {
       const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -85,7 +83,7 @@ app.post("/submit", (req, res) => {
   });
 });
 
-// Admin login POST
+// Admin login
 app.post("/admin/login", (req, res) => {
   const { username, password } = req.body;
 
@@ -115,7 +113,7 @@ app.post("/admin/login", (req, res) => {
   });
 });
 
-// ✅ Admin data (protected, paginated)
+// ✅ Protected: Admin suggestions data
 app.get("/admin/data", authMiddleware, (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = 10;
@@ -132,8 +130,8 @@ app.get("/admin/data", authMiddleware, (req, res) => {
   });
 });
 
-// ✅ Export CSV (protected)
-app.get("/admin/export", authMiddleware, (req, res) => {
+// ✅ Protected: CSV Export
+app.get("/admin/export", (req, res) => {
   db.query("SELECT * FROM suggestions", (err, data) => {
     if (err) return res.status(500).send("Export error");
 
@@ -147,11 +145,12 @@ app.get("/admin/export", authMiddleware, (req, res) => {
   });
 });
 
-// ✅ Keyword search (protected)
+// ✅ Protected: Keyword Search
 app.get("/admin/search", authMiddleware, (req, res) => {
   const keyword = req.query.q;
-  const sql = `SELECT * FROM suggestions WHERE name LIKE ? OR message LIKE ? OR category LIKE ? ORDER BY created_at DESC`;
   const like = `%${keyword}%`;
+  const sql = `SELECT * FROM suggestions WHERE name LIKE ? OR message LIKE ? OR category LIKE ? ORDER BY created_at DESC`;
+
   db.query(sql, [like, like, like], (err, results) => {
     if (err) return res.status(500).json({ message: "Search error" });
     res.json(results);
@@ -163,10 +162,8 @@ app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);
 });
 
-// ------------------------------------------------------------
-// 🔐 OPTIONAL ONE-TIME: Create Initial Admin User (run once)
-// ------------------------------------------------------------
 /*
+// Optional one-time admin user creation:
 const username = "admin";
 const plainPassword = "admin123";
 
