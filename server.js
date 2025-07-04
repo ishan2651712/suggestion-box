@@ -61,14 +61,15 @@ app.post("/submit", (req, res) => {
         },
       });
 
-      const mailOptions = {
+      const confirmationMail = {
         from: process.env.EMAIL_USER,
-        to: process.env.EMAIL_USER,
-        subject: "📬 New Suggestion Received",
-        text: `New suggestion from ${name} (${email}) [${category}]:\n\n${message}`,
+        to: email,
+        subject: "Thanks for your suggestion!",
+        text: `Hi ${name},\n\nThank you for your suggestion "${message}" on "${category}". We appreciate your input.\n\nRegards,\nTeam Suggestly,
+`,
       };
 
-      transporter.sendMail(mailOptions, (err, info) => {
+      transporter.sendMail(confirmationMail, (err, info) => {
         if (err) {
           console.error("❌ Email not sent:", err);
         } else {
