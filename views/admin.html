@@ -162,7 +162,7 @@
       </select>
 
       <button
-        onclick="window.location.href='/admin/export'"
+        onclick="exportCSV()"
         style="
           margin-bottom: 20px;
           padding: 10px 16px;
@@ -215,6 +215,30 @@
         localStorage.removeItem("token");
         alert("👋 Logged out successfully.");
         window.location.href = "/admin/login";
+      }
+
+      async function exportCSV() {
+        const token = localStorage.getItem("token");
+        try {
+          const response = await fetch("/admin/export", {
+            headers: { Authorization: "Bearer " + token },
+          });
+          if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error || "Export failed");
+          }
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "suggestions.csv";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        } catch (err) {
+          alert("❌ Export failed: " + err.message);
+        }
       }
 
       async function renderCharts() {

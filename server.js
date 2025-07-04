@@ -131,7 +131,7 @@ app.get("/admin/data", authMiddleware, (req, res) => {
 });
 
 // ✅ Protected: CSV Export
-app.get("/admin/export", (req, res) => {
+app.get("/admin/export", authMiddleware, (req, res) => {
   db.query("SELECT * FROM suggestions", (err, data) => {
     if (err) return res.status(500).send("Export error");
 
