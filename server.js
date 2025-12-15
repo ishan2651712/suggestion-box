@@ -168,7 +168,6 @@ app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);
 });
 
-/*
 // Optional one-time admin user creation:
 const username = "admin";
 const plainPassword = "admin123";
@@ -181,4 +180,3 @@ bcrypt.hash(plainPassword, 10, (err, hash) => {
     console.log("✅ Admin user created successfully.");
   });
 });
-*/
