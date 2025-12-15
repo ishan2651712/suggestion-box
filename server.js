@@ -169,14 +169,14 @@ app.listen(PORT, () => {
 });
 
 // Optional one-time admin user creation:
-const username = "admin";
-const plainPassword = "admin123";
+// const username = "admin";
+// const plainPassword = "admin123";
 
-bcrypt.hash(plainPassword, 10, (err, hash) => {
-  if (err) throw err;
-  const sql = "INSERT INTO admins (username, password) VALUES (?, ?)";
-  db.query(sql, [username, hash], (err, result) => {
-    if (err) throw err;
-    console.log("✅ Admin user created successfully.");
-  });
-});
+// bcrypt.hash(plainPassword, 10, (err, hash) => {
+//   if (err) throw err;
+//   const sql = "INSERT INTO admins (username, password) VALUES (?, ?)";
+//   db.query(sql, [username, hash], (err, result) => {
+//     if (err) throw err;
+//     console.log("✅ Admin user created successfully.");
+//   });
+// });
