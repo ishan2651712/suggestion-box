@@ -164,15 +164,14 @@ app.use((req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
 
 // Optional one-time admin user creation:
 
 // const username = "admin";
 // const plainPassword = "admin123";
-
 // bcrypt.hash(plainPassword, 10, (err, hash) => {
 //   if (err) throw err;
 //   const sql = "INSERT INTO admins (username, password) VALUES (?, ?)";
