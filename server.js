@@ -163,6 +163,11 @@ app.use((req, res) => {
   res.status(404).sendFile(__dirname + "/views/404.html");
 });
 
+// added health checkup
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
+
 // Start server
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Server running on port ${PORT}`);
